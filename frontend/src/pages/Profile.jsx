@@ -2,8 +2,8 @@ import React, { useState, useEffect, useContext } from 'react';
 import { useParams } from 'react-router-dom';
 import api from '../services/api';
 import { AuthContext } from '../context/AuthContext';
-import Post from '../components/Post';
-import { UserPlus, UserMinus, MessageSquare, Edit2 } from 'lucide-react';
+import PostModal from '../components/PostModal';
+import { UserPlus, UserMinus, MessageSquare, Edit2, Play } from 'lucide-react';
 import '../styles/Profile.css';
 
 const Profile = () => {
@@ -12,15 +12,15 @@ const Profile = () => {
   const [profile, setProfile] = useState(null);
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedPost, setSelectedPost] = useState(null);
 
   const fetchProfile = async () => {
     try {
       const { data } = await api.get(`/users/${id}`);
       setProfile(data);
       // Fetch user's posts
-      const feedRes = await api.get('/posts/feed'); // For now, filtering from feed. Ideally, a separate endpoint.
-      const userPosts = feedRes.data.filter(p => p.user._id === id);
-      setPosts(userPosts);
+      const postsRes = await api.get(`/posts/profile/${id}`);
+      setPosts(postsRes.data);
       setLoading(false);
     } catch (error) {
       console.error(error);
@@ -95,10 +95,36 @@ const Profile = () => {
       </div>
 
       <div className="profile-posts-grid">
-        {posts.map(post => (
-          <Post key={post._id} post={post} onUpdate={fetchProfile} currentUser={currentUser} />
-        ))}
+        {posts.length > 0 ? posts.map(post => {
+          if (!post.media) return null; // Instagram grid primarily shows media
+          return (
+            <div key={post._id} className="profile-grid-item" onClick={() => setSelectedPost(post)}>
+              {post.mediaType === 'video' ? (
+                <>
+                  <video src={`http://localhost:5001${post.media}`} />
+                  <div className="video-indicator"><Play size={20} fill="white" /></div>
+                </>
+              ) : (
+                <img src={`http://localhost:5001${post.media}`} alt="Post" />
+              )}
+              <div className="grid-overlay">
+                <div className="grid-overlay-stats">
+                  <span>❤️ {post.likes?.length || 0}</span>
+                  <span>💬 {post.comments?.length || 0}</span>
+                </div>
+              </div>
+            </div>
+          )
+        }) : (
+          <div className="no-posts-container" style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '40px' }}>
+            <p className="no-posts">No posts yet</p>
+          </div>
+        )}
       </div>
+
+      {selectedPost && (
+        <PostModal post={selectedPost} onClose={() => { setSelectedPost(null); fetchProfile(); }} />
+      )}
     </div>
   );
 };

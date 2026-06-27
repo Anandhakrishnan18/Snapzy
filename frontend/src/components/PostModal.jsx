@@ -1,17 +1,27 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Link } from 'react-router-dom';
-import { Heart, MessageCircle, Send, X } from 'lucide-react';
+import { Heart, MessageCircle, Send, X, Trash2, MoreHorizontal } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { AuthContext } from '../context/AuthContext';
 import api from '../services/api';
-import '../styles/Post.css';
+import '../styles/PostModal.css';
 
 const PostModal = ({ post: initialPost, onClose }) => {
   const [post, setPost] = useState(initialPost);
   const [commentText, setCommentText] = useState('');
+  const [showMenu, setShowMenu] = useState(false);
   const { user } = useContext(AuthContext);
 
   const isLiked = post.likes?.includes(user?._id);
+  const isOwner = post.user?._id === user?._id;
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
 
   const handleLike = async () => {
     try {
@@ -24,6 +34,19 @@ const PostModal = ({ post: initialPost, onClose }) => {
       }));
     } catch (error) {
       console.error('Error liking post:', error);
+    }
+  };
+
+  const handleDeletePost = async () => {
+    if (window.confirm('Are you sure you want to delete this post?')) {
+      try {
+        await api.delete(`/posts/${post._id}`);
+        // Assuming there is a global toast context, we might call it here.
+        // For now, closing it will trigger a refresh on Profile page via onClose callback
+        onClose();
+      } catch (error) {
+        console.error('Error deleting post:', error);
+      }
     }
   };
 
@@ -44,82 +67,135 @@ const PostModal = ({ post: initialPost, onClose }) => {
   };
 
   return (
-    <div className="modal-overlay" onClick={onClose} style={{ zIndex: 1000, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-      <div className="modal-content" onClick={e => e.stopPropagation()} style={{ maxWidth: '900px', width: '90%', display: 'flex', flexDirection: 'row', padding: 0, overflow: 'hidden', height: '80vh' }}>
+    <div className="fullscreen-modal-overlay" onClick={onClose}>
+      <button className="fullscreen-modal-close-btn" onClick={onClose}>
+        <X size={28} />
+      </button>
+      
+      <div className="fullscreen-modal-content" onClick={e => e.stopPropagation()}>
         
         {/* Left Side: Media */}
-        <div style={{ flex: 1, backgroundColor: '#000', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        <div className="modal-left-panel">
           {post.mediaType === 'video' ? (
-            <video src={`http://localhost:5001${post.media}`} controls autoPlay style={{ maxWidth: '100%', maxHeight: '100%' }} />
+            <video src={`http://localhost:5001${post.media}`} controls autoPlay />
           ) : (
-            <img src={`http://localhost:5001${post.media}`} alt="Post Media" style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
+            <img src={`http://localhost:5001${post.media}`} alt="Post Media" />
           )}
         </div>
 
         {/* Right Side: Details */}
-        <div style={{ width: '350px', display: 'flex', flexDirection: 'column', backgroundColor: 'var(--bg-card)', borderLeft: '1px solid var(--border-color)' }}>
+        <div className="modal-right-panel">
           {/* Header */}
-          <div className="post-header" style={{ padding: 'var(--spacing-md)', borderBottom: '1px solid var(--border-color)' }}>
-            <Link to={`/profile/${post.user._id}`} className="post-user-info" onClick={onClose}>
+          <div className="modal-header">
+            <Link to={`/profile/${post.user._id}`} className="modal-header-user" onClick={onClose}>
               {post.user.profilePic ? (
-                <img src={`http://localhost:5001${post.user.profilePic}`} alt="avatar" />
+                <img src={`http://localhost:5001${post.user.profilePic}`} alt="avatar" className="modal-header-avatar" />
               ) : (
-                <div className="avatar-placeholder">{post.user.username.charAt(0).toUpperCase()}</div>
+                <div className="modal-header-avatar" style={{ backgroundColor: 'var(--accent-pink)', display: 'flex', justifyContent: 'center', alignItems: 'center', color: 'white', fontWeight: 'bold' }}>
+                  {post.user.username.charAt(0).toUpperCase()}
+                </div>
               )}
-              <div>
-                <h4>{post.user.username}</h4>
-                <p>@{post.user.userId}</p>
+              <div className="modal-header-info">
+                <span className="modal-header-username">{post.user.username}</span>
+                <span className="modal-header-time">{formatDistanceToNow(new Date(post.createdAt))} ago</span>
               </div>
             </Link>
-            <button className="icon-btn" onClick={onClose}><X size={24} /></button>
+            
+            <div className="modal-header-actions">
+              {isOwner && (
+                <>
+                  <button className="modal-action-btn" onClick={() => setShowMenu(!showMenu)}>
+                    <MoreHorizontal size={20} />
+                  </button>
+                  {showMenu && (
+                    <div className="dropdown-menu">
+                      <button className="dropdown-item" onClick={handleDeletePost}>
+                        <Trash2 size={16} style={{ display: 'inline', marginRight: '8px', verticalAlign: 'text-bottom' }}/> 
+                        Delete Post
+                      </button>
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
           </div>
 
           {/* Comments Section */}
-          <div style={{ flex: 1, overflowY: 'auto', padding: 'var(--spacing-md)' }}>
+          <div className="modal-comments-section">
             {/* Caption */}
             {post.content && (
-              <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
-                <Link to={`/profile/${post.user._id}`} onClick={onClose} style={{ fontWeight: 'bold', color: 'var(--text-primary)', textDecoration: 'none' }}>
-                  {post.user.username}
+              <div className="comment-item" style={{ alignItems: 'flex-start' }}>
+                <Link to={`/profile/${post.user._id}`} onClick={onClose} className="comment-avatar">
+                  {post.user.profilePic ? (
+                    <img src={`http://localhost:5001${post.user.profilePic}`} alt="avatar" />
+                  ) : (
+                    <div className="avatar-placeholder-sm">{post.user.username.charAt(0).toUpperCase()}</div>
+                  )}
                 </Link>
-                <span style={{ color: 'var(--text-secondary)' }}>{post.content}</span>
+                <div className="comment-content">
+                  <div className="comment-header">
+                    <Link to={`/profile/${post.user._id}`} onClick={onClose} className="comment-user">
+                      <strong>{post.user.username}</strong>
+                    </Link>
+                  </div>
+                  <div className="comment-text">{post.content}</div>
+                </div>
               </div>
             )}
 
             {/* Comments */}
             {post.comments && post.comments.map(c => (
-              <div key={c._id} style={{ display: 'flex', gap: '10px', marginBottom: '15px' }}>
-                <Link to={`/profile/${c.user._id}`} onClick={onClose} style={{ fontWeight: 'bold', color: 'var(--text-primary)', textDecoration: 'none' }}>
-                  {c.user.username}
+              <div key={c._id} className="comment-item" style={{ alignItems: 'flex-start' }}>
+                <Link to={`/profile/${c.user._id}`} onClick={onClose} className="comment-avatar">
+                  {c.user.profilePic ? (
+                    <img src={`http://localhost:5001${c.user.profilePic}`} alt="avatar" />
+                  ) : (
+                    <div className="avatar-placeholder-sm">
+                      {c.user.username.charAt(0).toUpperCase()}
+                    </div>
+                  )}
                 </Link>
-                <span style={{ color: 'var(--text-secondary)' }}>{c.text}</span>
+                <div className="comment-content">
+                  <div className="comment-header">
+                    <Link to={`/profile/${c.user._id}`} onClick={onClose} className="comment-user">
+                      <strong>{c.user.username}</strong>
+                    </Link>
+                  </div>
+                  <div className="comment-text">{c.text}</div>
+                  {c.createdAt && (
+                    <div className="comment-time">
+                      {formatDistanceToNow(new Date(c.createdAt))} ago
+                    </div>
+                  )}
+                </div>
               </div>
             ))}
           </div>
 
           {/* Footer Actions */}
-          <div style={{ padding: 'var(--spacing-md)', borderTop: '1px solid var(--border-color)' }}>
-            <div className="post-actions" style={{ marginBottom: '10px' }}>
-              <button className={`action-btn ${isLiked ? 'liked' : ''}`} onClick={handleLike}>
+          <div className="modal-footer">
+            <div className="modal-action-icons">
+              <button className={`modal-action-btn ${isLiked ? 'liked' : ''}`} onClick={handleLike}>
                 <Heart size={24} fill={isLiked ? "currentColor" : "none"} />
               </button>
-              <button className="action-btn">
+              <button className="modal-action-btn">
                 <MessageCircle size={24} />
               </button>
+              <button className="modal-action-btn">
+                <Send size={24} />
+              </button>
             </div>
-            <div style={{ fontWeight: 'bold', marginBottom: '10px' }}>{post.likes?.length || 0} likes</div>
-            <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '15px' }}>
-              {formatDistanceToNow(new Date(post.createdAt))} ago
-            </div>
+            
+            <div className="modal-likes-count">{post.likes?.length || 0} likes</div>
 
-            <form onSubmit={handleComment} className="comment-form">
+            <form onSubmit={handleComment} className="modal-comment-input-wrapper">
               <input 
                 type="text" 
                 placeholder="Add a comment..." 
                 value={commentText}
                 onChange={(e) => setCommentText(e.target.value)}
               />
-              <button type="submit" disabled={!commentText.trim()} style={{ color: 'var(--accent-pink)', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 'bold' }}>Post</button>
+              <button type="submit" className="modal-comment-submit" disabled={!commentText.trim()}>Post</button>
             </form>
           </div>
         </div>

@@ -106,10 +106,24 @@ const Post = ({ post, onUpdate, currentUser }) => {
           <div className="comments-list">
             {post.comments.map(comment => (
               <div key={comment._id} className="comment-item">
-                <Link to={`/profile/${comment.user._id}`} className="comment-user">
-                  <strong>{comment.user.username}</strong>
+                <Link to={`/profile/${comment.user._id}`} className="comment-avatar">
+                  {comment.user.profilePic ? (
+                    <img src={`http://localhost:5001${comment.user.profilePic}`} alt="avatar" />
+                  ) : (
+                    <div className="avatar-placeholder-sm">{comment.user.username.charAt(0).toUpperCase()}</div>
+                  )}
                 </Link>
-                <span>{comment.text}</span>
+                <div className="comment-content">
+                  <div className="comment-header">
+                    <Link to={`/profile/${comment.user._id}`} className="comment-user">
+                      <strong>{comment.user.username}</strong>
+                    </Link>
+                  </div>
+                  <div className="comment-text">{comment.text}</div>
+                  <div className="comment-time">
+                    {comment.createdAt ? `${formatDistanceToNow(new Date(comment.createdAt))} ago` : ''}
+                  </div>
+                </div>
               </div>
             ))}
           </div>

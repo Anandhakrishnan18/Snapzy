@@ -27,14 +27,49 @@ router.post("/", protect, upload.single("media"), async (req, res) => {
   }
 });
 
-// Get feed (posts from followings + own posts)
+// Get feed (posts from followings + random public posts)
 router.get("/feed", protect, async (req, res) => {
   try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 20;
+    const skip = (page - 1) * limit;
+
     const currentUser = await User.findById(req.user._id);
     const followingIds = currentUser.following;
-    followingIds.push(req.user._id); // Include own posts
 
-    const posts = await Post.find({ user: { $in: followingIds } })
+    // 1. Fetch posts from followed users (excluding own posts)
+    let posts = await Post.find({ user: { $in: followingIds } })
+      .populate("user", "userId username profilePic")
+      .populate("comments.user", "userId username profilePic")
+      .sort("-createdAt")
+      .skip(skip)
+      .limit(limit);
+
+    // 2. If not enough posts, fetch random public posts
+    if (posts.length < limit) {
+      const remaining = limit - posts.length;
+      const excludeIds = [...followingIds, req.user._id];
+      
+      const extraPosts = await Post.find({ user: { $nin: excludeIds } })
+        .populate("user", "userId username profilePic")
+        .populate("comments.user", "userId username profilePic")
+        .sort("-createdAt")
+        .skip(skip)
+        .limit(remaining);
+        
+      posts = [...posts, ...extraPosts];
+    }
+
+    res.json(posts);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Get posts for a specific user's profile
+router.get("/profile/:userId", protect, async (req, res) => {
+  try {
+    const posts = await Post.find({ user: req.params.userId })
       .populate("user", "userId username profilePic")
       .populate("comments.user", "userId username profilePic")
       .sort("-createdAt");
