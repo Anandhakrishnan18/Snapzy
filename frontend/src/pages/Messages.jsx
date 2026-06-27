@@ -2,7 +2,8 @@ import React, { useState, useEffect, useContext, useRef } from 'react';
 import api from '../services/api';
 import { AuthContext } from '../context/AuthContext';
 import { SocketContext } from '../context/SocketContext';
-import { format, formatDistanceToNow } from 'date-fns';
+import { format } from 'date-fns';
+import { formatCompactTime } from '../utils/formatTime';
 import { Send, Image as ImageIcon, ArrowLeft, Check, CheckCheck } from 'lucide-react';
 import '../styles/Messages.css';
 
@@ -201,7 +202,7 @@ const Messages = () => {
                     <h4>{conv.user.username}</h4>
                     {conv.createdAt && new Date(conv.createdAt).getTime() > 0 && (
                       <span className="conv-time">
-                        {formatDistanceToNow(new Date(conv.createdAt), { addSuffix: true })}
+                        {formatCompactTime(conv.createdAt)}
                       </span>
                     )}
                   </div>
@@ -249,7 +250,7 @@ const Messages = () => {
                   {onlineUsers.includes(activeChat._id) 
                     ? 'Online' 
                     : activeChat.lastSeen 
-                      ? `Last seen ${formatDistanceToNow(new Date(activeChat.lastSeen))} ago` 
+                      ? `Last seen ${formatCompactTime(activeChat.lastSeen)}` 
                       : 'Offline'}
                 </span>
               </div>

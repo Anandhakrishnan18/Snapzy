@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { Heart, MessageCircle, Send, X, Trash2, MoreHorizontal } from 'lucide-react';
-import { formatDistanceToNow } from 'date-fns';
+import { formatCompactTime } from '../utils/formatTime';
 import { AuthContext } from '../context/AuthContext';
 import api from '../services/api';
 import '../styles/PostModal.css';
@@ -10,6 +10,8 @@ const PostModal = ({ post: initialPost, onClose }) => {
   const [post, setPost] = useState(initialPost);
   const [commentText, setCommentText] = useState('');
   const [showMenu, setShowMenu] = useState(false);
+  const [showComments, setShowComments] = useState(false);
+  const [captionExpanded, setCaptionExpanded] = useState(false);
   const { user } = useContext(AuthContext);
 
   const isLiked = post.likes?.includes(user?._id);
@@ -41,8 +43,6 @@ const PostModal = ({ post: initialPost, onClose }) => {
     if (window.confirm('Are you sure you want to delete this post?')) {
       try {
         await api.delete(`/posts/${post._id}`);
-        // Assuming there is a global toast context, we might call it here.
-        // For now, closing it will trigger a refresh on Profile page via onClose callback
         onClose();
       } catch (error) {
         console.error('Error deleting post:', error);
@@ -81,6 +81,21 @@ const PostModal = ({ post: initialPost, onClose }) => {
           ) : (
             <img src={`http://localhost:5001${post.media}`} alt="Post Media" />
           )}
+
+          {/* Caption Overlay */}
+          {post.content && (
+            <div className="modal-caption-overlay">
+              <div className="caption-username">{post.user.username}</div>
+              <div className={`caption-text ${!captionExpanded ? 'clamped' : ''}`}>
+                {post.content}
+              </div>
+              {!captionExpanded && post.content.length > 100 && (
+                <button className="caption-more-btn" onClick={() => setCaptionExpanded(true)}>
+                  See More
+                </button>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Right Side: Details */}
@@ -97,7 +112,7 @@ const PostModal = ({ post: initialPost, onClose }) => {
               )}
               <div className="modal-header-info">
                 <span className="modal-header-username">{post.user.username}</span>
-                <span className="modal-header-time">{formatDistanceToNow(new Date(post.createdAt))} ago</span>
+                <span className="modal-header-time">{formatCompactTime(post.createdAt)}</span>
               </div>
             </Link>
             
@@ -120,65 +135,54 @@ const PostModal = ({ post: initialPost, onClose }) => {
             </div>
           </div>
 
-          {/* Comments Section */}
-          <div className="modal-comments-section">
-            {/* Caption */}
-            {post.content && (
-              <div className="comment-item" style={{ alignItems: 'flex-start' }}>
-                <Link to={`/profile/${post.user._id}`} onClick={onClose} className="comment-avatar">
-                  {post.user.profilePic ? (
-                    <img src={`http://localhost:5001${post.user.profilePic}`} alt="avatar" />
-                  ) : (
-                    <div className="avatar-placeholder-sm">{post.user.username.charAt(0).toUpperCase()}</div>
-                  )}
-                </Link>
-                <div className="comment-content">
-                  <div className="comment-header">
-                    <Link to={`/profile/${post.user._id}`} onClick={onClose} className="comment-user">
-                      <strong>{post.user.username}</strong>
-                    </Link>
-                  </div>
-                  <div className="comment-text">{post.content}</div>
-                </div>
-              </div>
-            )}
-
-            {/* Comments */}
-            {post.comments && post.comments.map(c => (
-              <div key={c._id} className="comment-item" style={{ alignItems: 'flex-start' }}>
-                <Link to={`/profile/${c.user._id}`} onClick={onClose} className="comment-avatar">
-                  {c.user.profilePic ? (
-                    <img src={`http://localhost:5001${c.user.profilePic}`} alt="avatar" />
-                  ) : (
-                    <div className="avatar-placeholder-sm">
-                      {c.user.username.charAt(0).toUpperCase()}
+          {/* Middle Section: Comments OR Empty State */}
+          {showComments ? (
+            <div className="modal-comments-section">
+              {post.comments && post.comments.length > 0 ? post.comments.map(c => (
+                <div key={c._id} className="comment-item" style={{ alignItems: 'flex-start' }}>
+                  <Link to={`/profile/${c.user._id}`} onClick={onClose} className="comment-avatar">
+                    {c.user.profilePic ? (
+                      <img src={`http://localhost:5001${c.user.profilePic}`} alt="avatar" />
+                    ) : (
+                      <div className="avatar-placeholder-sm">
+                        {c.user.username.charAt(0).toUpperCase()}
+                      </div>
+                    )}
+                  </Link>
+                  <div className="comment-content">
+                    <div className="comment-header">
+                      <Link to={`/profile/${c.user._id}`} onClick={onClose} className="comment-user">
+                        <strong>{c.user.username}</strong>
+                      </Link>
                     </div>
-                  )}
-                </Link>
-                <div className="comment-content">
-                  <div className="comment-header">
-                    <Link to={`/profile/${c.user._id}`} onClick={onClose} className="comment-user">
-                      <strong>{c.user.username}</strong>
-                    </Link>
+                    <div className="comment-text">{c.text}</div>
+                    {c.createdAt && (
+                      <div className="comment-time">
+                        {formatCompactTime(c.createdAt)}
+                      </div>
+                    )}
                   </div>
-                  <div className="comment-text">{c.text}</div>
-                  {c.createdAt && (
-                    <div className="comment-time">
-                      {formatDistanceToNow(new Date(c.createdAt))} ago
-                    </div>
-                  )}
                 </div>
-              </div>
-            ))}
-          </div>
+              )) : (
+                <div style={{ textAlign: 'center', color: 'var(--text-secondary)', padding: '20px', marginTop: '20px' }}>
+                  No comments yet. Be the first to comment!
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="modal-empty-state">
+              <MessageCircle size={48} strokeWidth={1} opacity={0.5} />
+              <p>Click the comment icon<br />to view comments.</p>
+            </div>
+          )}
 
-          {/* Footer Actions */}
+          {/* Footer Actions (Always Visible) */}
           <div className="modal-footer">
             <div className="modal-action-icons">
               <button className={`modal-action-btn ${isLiked ? 'liked' : ''}`} onClick={handleLike}>
                 <Heart size={24} fill={isLiked ? "currentColor" : "none"} />
               </button>
-              <button className="modal-action-btn">
+              <button className="modal-action-btn" onClick={() => setShowComments(!showComments)}>
                 <MessageCircle size={24} />
               </button>
               <button className="modal-action-btn">
@@ -188,15 +192,18 @@ const PostModal = ({ post: initialPost, onClose }) => {
             
             <div className="modal-likes-count">{post.likes?.length || 0} likes</div>
 
-            <form onSubmit={handleComment} className="modal-comment-input-wrapper">
-              <input 
-                type="text" 
-                placeholder="Add a comment..." 
-                value={commentText}
-                onChange={(e) => setCommentText(e.target.value)}
-              />
-              <button type="submit" className="modal-comment-submit" disabled={!commentText.trim()}>Post</button>
-            </form>
+            {/* Comment Input Only When showComments is true */}
+            {showComments && (
+              <form onSubmit={handleComment} className="modal-comment-input-wrapper">
+                <input 
+                  type="text" 
+                  placeholder="Add a comment..." 
+                  value={commentText}
+                  onChange={(e) => setCommentText(e.target.value)}
+                />
+                <button type="submit" className="modal-comment-submit" disabled={!commentText.trim()}>Post</button>
+              </form>
+            )}
           </div>
         </div>
       </div>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { formatDistanceToNow } from 'date-fns';
-import { Heart, MessageCircle, UserPlus, MessageSquare } from 'lucide-react';
+import { Bell, UserPlus, Heart, MessageSquare } from 'lucide-react';
+import { formatCompactTime } from '../utils/formatTime';
 import api from '../services/api';
 import '../styles/Notifications.css';
 
@@ -72,7 +72,7 @@ const Notifications = () => {
                 <p>
                   <strong><Link to={`/profile/${notif.sender._id}`}>{notif.sender.username}</Link></strong> {getMessage(notif.type)}
                 </p>
-                <span className="notification-time">{formatDistanceToNow(new Date(notif.createdAt))} ago</span>
+                <span className="notification-time">{formatCompactTime(notif.createdAt)}</span>
               </div>
             </div>
           ))}
