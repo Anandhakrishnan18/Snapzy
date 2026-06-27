@@ -31,7 +31,7 @@
 }
 
 .search-bar-wrapper:focus-within {
-  box-shadow: 0 0 0 3px rgba(236, 27, 114, 0.3);
+  box-shadow: 0 0 0 3px var(--accent-alpha);
 }
 
 .search-icon {

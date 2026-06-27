@@ -39,12 +39,12 @@
 }
 
 .settings-sidebar button:hover {
-  background-color: rgba(255, 255, 255, 0.05);
+  background-color: var(--input-bg);
   color: var(--text-primary);
 }
 
 .settings-sidebar button.active {
-  background-color: rgba(236, 27, 114, 0.1);
+  background-color: var(--accent-alpha);
   color: var(--accent-pink);
   border-left: 3px solid var(--accent-pink);
 }
@@ -77,9 +77,101 @@
 
 .settings-form label {
   display: block;
-  margin-bottom: var(--spacing-sm);
+  margin-top: 5px;
+}
+
+/* Theme Selection UI */
+.theme-options {
+  display: flex;
+  gap: var(--spacing-lg);
+  margin-top: var(--spacing-md);
+}
+
+@media (max-width: 768px) {
+  .theme-options {
+    flex-direction: column;
+  }
+}
+
+.theme-card {
+  flex: 1;
+  background-color: var(--bg-card);
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-md);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.theme-card:hover {
+  border-color: var(--text-secondary);
+}
+
+.theme-card.active {
+  border-color: var(--accent-pink);
+  background-color: var(--accent-alpha);
+}
+
+.theme-preview {
+  width: 100%;
+  height: 80px;
+  border-radius: var(--radius-md);
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  box-shadow: var(--shadow-sm) inset;
+}
+
+.theme-preview.dark-preview {
+  background-color: #08132d;
+  border: 1px solid #1a2a50;
+}
+.theme-preview.dark-preview .theme-circle { background-color: #ec1b72; }
+.theme-preview.dark-preview .theme-line { background-color: #0d1e45; }
+
+.theme-preview.enterprise-preview {
+  background-color: #EEF3FC;
+  border: 1px solid #DDE1E6;
+}
+.theme-preview.enterprise-preview .theme-circle { background-color: #0F62FE; }
+.theme-preview.enterprise-preview .theme-line { background-color: #FFFFFF; border: 1px solid #DDE1E6; }
+
+.theme-circle {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+}
+.theme-line {
+  height: 8px;
+  width: 100%;
+  border-radius: 4px;
+}
+.theme-line.short {
+  width: 60%;
+}
+
+.theme-info h4 {
+  font-size: 1.1rem;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+.theme-info p {
+  font-size: 0.85rem;
   color: var(--text-secondary);
-  font-size: 0.9rem;
+  margin-bottom: 8px;
+}
+.active-badge {
+  display: inline-block;
+  background-color: var(--accent-pink);
+  color: #fff;
+  font-size: 0.75rem;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-weight: 600;
 }
 
 .settings-form input[type="text"],
@@ -89,7 +181,7 @@
   width: 100%;
   padding: 10px 14px;
   border-radius: var(--radius-sm);
-  background-color: rgba(255, 255, 255, 0.05);
+  background-color: var(--input-bg);
   border: 1px solid var(--border-color);
   color: var(--text-primary);
   font-size: 0.95rem;

@@ -163,7 +163,7 @@
 
 .comment-form input {
   flex: 1;
-  background-color: rgba(255, 255, 255, 0.05);
+  background-color: var(--input-bg);
   border: 1px solid var(--border-color);
   padding: 8px 12px;
   border-radius: var(--radius-full);

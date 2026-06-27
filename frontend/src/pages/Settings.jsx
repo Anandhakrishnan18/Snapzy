@@ -1,10 +1,12 @@
 import React, { useState, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
+import { ThemeContext } from '../context/ThemeContext';
 import api from '../services/api';
 import '../styles/Settings.css';
 
 const Settings = () => {
   const { user, updateProfile, logout } = useContext(AuthContext);
+  const { theme, toggleTheme } = useContext(ThemeContext);
   const [activeTab, setActiveTab] = useState('account');
   const [message, setMessage] = useState('');
   
@@ -80,6 +82,7 @@ const Settings = () => {
       <div className="settings-layout">
         <div className="settings-sidebar">
           <button className={activeTab === 'account' ? 'active' : ''} onClick={() => setActiveTab('account')}>Account</button>
+          <button className={activeTab === 'appearance' ? 'active' : ''} onClick={() => setActiveTab('appearance')}>Appearance</button>
           <button className={activeTab === 'privacy' ? 'active' : ''} onClick={() => setActiveTab('privacy')}>Privacy & Notifications</button>
           <button className={activeTab === 'password' ? 'active' : ''} onClick={() => setActiveTab('password')}>Change Password</button>
         </div>
@@ -108,6 +111,49 @@ const Settings = () => {
               </div>
               <button type="submit" className="btn-primary">Save Changes</button>
             </form>
+          )}
+
+          {activeTab === 'appearance' && (
+            <div className="settings-form">
+              <h3>Appearance</h3>
+              <p style={{ color: 'var(--text-secondary)', marginBottom: 'var(--spacing-md)' }}>
+                Customize how Snapzy looks on your device.
+              </p>
+              
+              <div className="theme-options">
+                <div 
+                  className={`theme-card ${theme === 'dark' ? 'active' : ''}`}
+                  onClick={() => toggleTheme('dark')}
+                >
+                  <div className="theme-preview dark-preview">
+                    <div className="theme-circle"></div>
+                    <div className="theme-line"></div>
+                    <div className="theme-line short"></div>
+                  </div>
+                  <div className="theme-info">
+                    <h4>Snapzy Dark</h4>
+                    <p>Dark Blue • Pink Accent</p>
+                    {theme === 'dark' && <span className="active-badge">Currently Active</span>}
+                  </div>
+                </div>
+
+                <div 
+                  className={`theme-card ${theme === 'enterprise' ? 'active' : ''}`}
+                  onClick={() => toggleTheme('enterprise')}
+                >
+                  <div className="theme-preview enterprise-preview">
+                    <div className="theme-circle"></div>
+                    <div className="theme-line"></div>
+                    <div className="theme-line short"></div>
+                  </div>
+                  <div className="theme-info">
+                    <h4>Enterprise Light</h4>
+                    <p>IBM Carbon Inspired • Light Background • Blue Accent</p>
+                    {theme === 'enterprise' && <span className="active-badge">Currently Active</span>}
+                  </div>
+                </div>
+              </div>
+            </div>
           )}
 
           {activeTab === 'password' && (

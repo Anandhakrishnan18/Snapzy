@@ -6,7 +6,7 @@
 
 .sidebar {
   width: 280px;
-  background-color: var(--bg-card);
+  background-color: var(--bg-sidebar);
   border-right: 1px solid var(--border-color);
   display: flex;
   flex-direction: column;
@@ -43,20 +43,20 @@
   gap: var(--spacing-md);
   padding: var(--spacing-md) var(--spacing-lg);
   border-radius: var(--radius-lg);
-  color: var(--text-primary);
+  color: var(--text-sidebar);
   font-weight: 500;
   transition: all 0.2s ease;
 }
 
 .nav-link:hover, .nav-link.active {
-  background-color: var(--bg-card-hover);
-  color: var(--accent-pink);
+  background-color: var(--bg-sidebar-hover);
+  color: var(--text-sidebar-hover);
 }
 
 .nav-search-input {
   background: transparent;
   border: none;
-  color: var(--text-primary);
+  color: var(--text-sidebar);
   width: 100%;
 }
 
@@ -65,12 +65,12 @@
 }
 
 .search-bar {
-  background-color: var(--bg-dark);
+  background-color: var(--bg-sidebar);
   border: 1px solid var(--border-color);
 }
 
 .search-bar:focus-within {
-  border-color: var(--accent-pink);
+  border-color: var(--text-sidebar-hover);
 }
 
 .sidebar-footer {
