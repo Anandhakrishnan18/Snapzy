@@ -1,0 +1,138 @@
+.settings-container {
+  padding-top: var(--spacing-xl);
+  padding-bottom: var(--spacing-xl);
+  max-width: 900px;
+}
+
+.settings-container h2 {
+  font-size: 1.8rem;
+  margin-bottom: var(--spacing-xl);
+}
+
+.settings-layout {
+  display: flex;
+  gap: var(--spacing-xl);
+  background-color: var(--bg-card);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  min-height: 500px;
+}
+
+.settings-sidebar {
+  width: 250px;
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+}
+
+.settings-sidebar button {
+  padding: var(--spacing-md) var(--spacing-lg);
+  text-align: left;
+  color: var(--text-secondary);
+  font-weight: 500;
+  transition: all 0.2s ease;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.settings-sidebar button:last-child {
+  border-bottom: none;
+}
+
+.settings-sidebar button:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  color: var(--text-primary);
+}
+
+.settings-sidebar button.active {
+  background-color: rgba(236, 27, 114, 0.1);
+  color: var(--accent-pink);
+  border-left: 3px solid var(--accent-pink);
+}
+
+.settings-content {
+  flex: 1;
+  padding: var(--spacing-xl);
+}
+
+.settings-message {
+  background-color: rgba(34, 197, 94, 0.1);
+  color: #22c55e;
+  padding: var(--spacing-md);
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--spacing-lg);
+}
+
+.settings-form {
+  max-width: 500px;
+}
+
+.settings-form h3 {
+  margin-bottom: var(--spacing-lg);
+  color: var(--text-primary);
+}
+
+.settings-form .form-group {
+  margin-bottom: var(--spacing-md);
+}
+
+.settings-form label {
+  display: block;
+  margin-bottom: var(--spacing-sm);
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.settings-form input[type="text"],
+.settings-form input[type="email"],
+.settings-form input[type="password"],
+.settings-form textarea {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  font-size: 0.95rem;
+}
+
+.settings-form input:focus,
+.settings-form textarea:focus {
+  border-color: var(--accent-pink);
+}
+
+.checkbox-group label {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  color: var(--text-primary);
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.mt-4 {
+  margin-top: 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .settings-layout {
+    flex-direction: column;
+  }
+  
+  .settings-sidebar {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid var(--border-color);
+    flex-direction: row;
+    overflow-x: auto;
+  }
+  
+  .settings-sidebar button {
+    border-bottom: none;
+    white-space: nowrap;
+  }
+  
+  .settings-sidebar button.active {
+    border-left: none;
+    border-bottom: 3px solid var(--accent-pink);
+  }
+}

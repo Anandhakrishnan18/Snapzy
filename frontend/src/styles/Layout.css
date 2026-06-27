@@ -1,0 +1,124 @@
+.layout {
+  display: flex;
+  min-height: 100vh;
+  background-color: var(--bg-dark);
+}
+
+.sidebar {
+  width: 280px;
+  background-color: var(--bg-card);
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  height: 100vh;
+  padding: var(--spacing-xl) 0;
+  z-index: 50;
+  transition: all 0.3s ease;
+}
+
+.logo {
+  padding: 0 var(--spacing-xl);
+  margin-bottom: var(--spacing-xl);
+}
+
+.logo h2 {
+  color: var(--accent-pink);
+  font-size: 1.8rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.nav-menu {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: var(--spacing-sm);
+  padding: 0 var(--spacing-md);
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-radius: var(--radius-lg);
+  color: var(--text-primary);
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.nav-link:hover, .nav-link.active {
+  background-color: var(--bg-card-hover);
+  color: var(--accent-pink);
+}
+
+.nav-search-input {
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  width: 100%;
+}
+
+.nav-search-input::placeholder {
+  color: var(--text-secondary);
+}
+
+.search-bar {
+  background-color: var(--bg-dark);
+  border: 1px solid var(--border-color);
+}
+
+.search-bar:focus-within {
+  border-color: var(--accent-pink);
+}
+
+.sidebar-footer {
+  padding: 0 var(--spacing-md);
+}
+
+.logout-btn {
+  width: 100%;
+  justify-content: flex-start;
+  color: #ef4444;
+}
+
+.logout-btn:hover {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+}
+
+.main-content {
+  flex: 1;
+  margin-left: 280px;
+  min-height: 100vh;
+  position: relative;
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    width: 80px;
+    padding: var(--spacing-md) 0;
+  }
+  
+  .logo h2 {
+    display: none;
+  }
+  
+  .nav-link span {
+    display: none;
+  }
+  
+  .nav-link {
+    justify-content: center;
+    padding: var(--spacing-md);
+  }
+  
+  .search-bar {
+    display: none;
+  }
+  
+  .main-content {
+    margin-left: 80px;
+  }
+}
