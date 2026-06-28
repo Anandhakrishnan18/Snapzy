@@ -48,9 +48,14 @@
   transition: all 0.2s ease;
 }
 
-.nav-link:hover, .nav-link.active {
+.nav-link:hover {
   background-color: var(--bg-sidebar-hover);
   color: var(--text-sidebar-hover);
+}
+
+.nav-link.active {
+  background-color: var(--bg-sidebar-active);
+  color: var(--text-sidebar-active);
 }
 
 .nav-search-input {

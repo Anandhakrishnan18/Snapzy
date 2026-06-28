@@ -8,8 +8,10 @@
   
   --bg-sidebar: var(--bg-card);
   --bg-sidebar-hover: var(--bg-card-hover);
+  --bg-sidebar-active: var(--bg-card-hover);
   --text-sidebar: #ffffff;
   --text-sidebar-hover: #ec1b72;
+  --text-sidebar-active: #ec1b72;
   
   --input-bg: rgba(255, 255, 255, 0.05);
   --input-border: #1a2a50;
@@ -52,10 +54,12 @@
   --bg-card: #FFFFFF;
   --bg-card-hover: #F4F4F4;
   
-  --bg-sidebar: #262626;
-  --bg-sidebar-hover: #393939;
-  --text-sidebar: #FFFFFF;
+  --bg-sidebar: #FFFFFF;
+  --bg-sidebar-hover: #F4F7FC;
+  --bg-sidebar-active: #E8F0FF;
+  --text-sidebar: #161616;
   --text-sidebar-hover: #0F62FE;
+  --text-sidebar-active: #0F62FE;
   
   --input-bg: #FFFFFF;
   --input-border: #DDE1E6;

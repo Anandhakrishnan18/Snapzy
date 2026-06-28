@@ -8,7 +8,10 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const userInfo = localStorage.getItem('userInfo');
+    // Clear old localStorage if present to prevent lingering data
+    localStorage.removeItem('userInfo');
+    
+    const userInfo = sessionStorage.getItem('userInfo');
     if (userInfo) {
       setUser(JSON.parse(userInfo));
     }
@@ -17,7 +20,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (loginId, password) => {
     const { data } = await api.post('/auth/login', { loginId, password });
-    localStorage.setItem('userInfo', JSON.stringify(data));
+    sessionStorage.setItem('userInfo', JSON.stringify(data));
     setUser(data);
     return data;
   };
@@ -28,6 +31,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
+    sessionStorage.removeItem('userInfo');
     localStorage.removeItem('userInfo');
     setUser(null);
   };
@@ -38,7 +42,7 @@ export const AuthProvider = ({ children }) => {
     });
     // merge token from current user
     const updatedUser = { ...data, token: user.token };
-    localStorage.setItem('userInfo', JSON.stringify(updatedUser));
+    sessionStorage.setItem('userInfo', JSON.stringify(updatedUser));
     setUser(updatedUser);
     return data;
   };
