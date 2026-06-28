@@ -3,6 +3,8 @@ const Post = require("../models/Post");
 const User = require("../models/User");
 const { protect } = require("../middleware/auth");
 const upload = require("../middleware/upload");
+const { createNotification } = require("../utils/notification");
+const Notification = require("../models/Notification");
 
 const router = express.Router();
 
@@ -123,9 +125,26 @@ router.put("/:id/like", protect, async (req, res) => {
     const post = await Post.findById(req.params.id);
     if (!post.likes.includes(req.user._id)) {
       await post.updateOne({ $push: { likes: req.user._id } });
+      
+      // Create notification
+      await createNotification(req, {
+        receiver: post.user,
+        type: "like",
+        post: post._id
+      });
+      
       res.json({ message: "Post liked" });
     } else {
       await post.updateOne({ $pull: { likes: req.user._id } });
+      
+      // Optionally delete notification
+      await Notification.deleteOne({
+        sender: req.user._id,
+        receiver: post.user,
+        type: "like",
+        post: post._id
+      });
+      
       res.json({ message: "Post unliked" });
     }
   } catch (error) {
@@ -146,6 +165,13 @@ router.post("/:id/comment", protect, async (req, res) => {
 
     post.comments.push(newComment);
     await post.save();
+    
+    // Create notification
+    await createNotification(req, {
+      receiver: post.user,
+      type: "comment",
+      post: post._id
+    });
     
     await post.populate("comments.user", "userId username profilePic");
     res.status(201).json(post.comments);

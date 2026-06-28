@@ -2,6 +2,8 @@ const express = require("express");
 const User = require("../models/User");
 const { protect } = require("../middleware/auth");
 const upload = require("../middleware/upload");
+const { createNotification } = require("../utils/notification");
+const Notification = require("../models/Notification");
 
 const router = express.Router();
 
@@ -80,10 +82,25 @@ router.put("/:id/follow", protect, async (req, res) => {
     if (!targetUser.followers.includes(req.user._id)) {
       await targetUser.updateOne({ $push: { followers: req.user._id } });
       await currentUser.updateOne({ $push: { following: req.params.id } });
+      
+      // Create notification
+      await createNotification(req, {
+        receiver: targetUser._id,
+        type: "follow"
+      });
+      
       res.json({ message: "User followed" });
     } else {
       await targetUser.updateOne({ $pull: { followers: req.user._id } });
       await currentUser.updateOne({ $pull: { following: req.params.id } });
+      
+      // Optionally delete notification
+      await Notification.deleteOne({
+        sender: req.user._id,
+        receiver: targetUser._id,
+        type: "follow"
+      });
+      
       res.json({ message: "User unfollowed" });
     }
   } catch (error) {

@@ -15,7 +15,21 @@
   gap: var(--spacing-sm);
 }
 
+.notification-section {
+  margin-bottom: var(--spacing-xl);
+}
+
+.notification-section-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: var(--spacing-md);
+  padding-bottom: var(--spacing-sm);
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-primary);
+}
+
 .notification-item {
+  cursor: pointer;
   display: flex;
   align-items: center;
   gap: var(--spacing-md);

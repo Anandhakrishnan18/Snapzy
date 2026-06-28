@@ -2,6 +2,7 @@ const express = require("express");
 const Message = require("../models/Message");
 const User = require("../models/User");
 const { protect } = require("../middleware/auth");
+const { createNotification } = require("../utils/notification");
 
 const router = express.Router();
 
@@ -106,6 +107,13 @@ router.post("/", protect, async (req, res) => {
     });
 
     await newMessage.save();
+    
+    // Create notification for new message
+    await createNotification(req, {
+      receiver: receiverId,
+      type: "message"
+    });
+    
     res.status(201).json(newMessage);
   } catch (error) {
     res.status(500).json({ message: error.message });

@@ -9,6 +9,12 @@ const app = express();
 const server = http.createServer(app);
 const io = require("./socket")(server);
 
+// Attach Socket.io to req
+app.use((req, res, next) => {
+  req.io = io;
+  next();
+});
+
 // Middleware
 app.use(cors({
   origin: "http://localhost:5173", // Vite default port

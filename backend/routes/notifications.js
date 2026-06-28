@@ -18,6 +18,16 @@ router.get("/", protect, async (req, res) => {
   }
 });
 
+// Get unread count
+router.get("/unread", protect, async (req, res) => {
+  try {
+    const count = await Notification.countDocuments({ receiver: req.user._id, isRead: false });
+    res.json({ count });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 // Mark all as read
 router.put("/read", protect, async (req, res) => {
   try {

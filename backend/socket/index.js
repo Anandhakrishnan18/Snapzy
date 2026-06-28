@@ -78,5 +78,6 @@ module.exports = function (server) {
     });
   });
 
+  io.onlineUsers = onlineUsers;
   return io;
 };

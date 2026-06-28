@@ -7,7 +7,7 @@ import '../styles/Layout.css';
 
 const Layout = () => {
   const { user, logout } = useContext(AuthContext);
-  const { globalUnreadCount, toastNotification } = useContext(SocketContext);
+  const { globalUnreadCount, toastNotification, notificationUnreadCount } = useContext(SocketContext);
   const location = useLocation();
 
   if (!user) {
@@ -38,8 +38,14 @@ const Layout = () => {
               </span>
             )}
           </Link>
-          <Link to="/notifications" className={`nav-link ${location.pathname === '/notifications' ? 'active' : ''}`}>
-            <Bell /> <span>Notifications</span>
+          <Link to="/notifications" className={`nav-link ${location.pathname === '/notifications' ? 'active' : ''}`} style={{ position: 'relative' }}>
+            <Bell /> 
+            <span>Notifications</span>
+            {notificationUnreadCount > 0 && (
+              <span className="unread-badge" style={{ position: 'absolute', top: '10px', right: '10px', background: 'var(--accent-pink)', color: 'white', fontSize: '0.7rem', padding: '2px 6px', borderRadius: '10px', fontWeight: 'bold' }}>
+                {notificationUnreadCount}
+              </span>
+            )}
           </Link>
           <Link to={`/profile/${user._id}`} className={`nav-link ${location.pathname.startsWith('/profile') ? 'active' : ''}`}>
             <User /> <span>Profile</span>
